@@ -1,0 +1,1 @@
+mongod --dbpath `pwd`/db --port 12345

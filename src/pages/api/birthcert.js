@@ -1,0 +1,104 @@
+// pages/api/insert.js
+import sqlite3 from 'sqlite3';
+
+const dbPath = './database/ocr.db';
+
+export default function handler(req, res) {
+    if (req.method === 'GET') {
+        let db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ error: 'Failed to connect to the database' });
+            }
+        });
+
+        const sql = `SELECT 
+            proposal,
+            name,
+            id_number,
+            gender,
+            dob,
+            mother_name,
+            mother_id,
+            father_name,
+            father_id
+         FROM birthcert ORDER BY id`;
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.status(200).json(rows);
+        });
+
+        db.close();
+    }
+    else if (req.method === 'POST') {
+        const { proposal,
+            name,
+            id,
+            gender,
+            dob,
+            motherName,
+            motherId,
+            fatherName,
+            fatherId,
+         } = req.body;
+        if (!proposal || !name || !id || !dob || !motherName || !motherId || !fatherName || !fatherId) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        let db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
+            if (err) {
+                console.error(err.message);
+                res.status(500).json({ error: 'Failed to connect to the database' });
+            }
+        });
+
+        console.log(proposal,
+            name,
+            id,
+            gender,
+            dob,
+            motherName,
+            motherId,
+            fatherName,
+            fatherId)
+
+        const sql = `INSERT INTO birthcert 
+        (
+            proposal,
+            name,
+            id_number,
+            gender,
+            dob,
+            mother_name,
+            mother_id,
+            father_name,
+            father_id
+        ) VALUES 
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        db.run(sql, [
+            proposal,
+            name,
+            id,
+            gender,
+            dob,
+            motherName,
+            motherId,
+            fatherName,
+            fatherId,
+        ], function(err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else {
+                res.status(201).json({ message: 'Data inserted successfully', id: this.lastID });
+            }
+        });
+
+        db.close();
+    } else {
+        res.setHeader('Allow', ['POST']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+}
