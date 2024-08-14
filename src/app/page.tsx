@@ -7,6 +7,9 @@ export default function Home() {
       <Link href="/birthcert">
           View Birthcert Records
       </Link>
+      <Link href="/household">
+          View Household Records
+      </Link>
     </main>
   );
 }

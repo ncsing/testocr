@@ -9,6 +9,8 @@ let db = new sqlite3.Database('./database/ocr.db', (err) => {
 });
 
 db.serialize(() => {
+
+    // Birthcert Table
     db.run(`CREATE TABLE IF NOT EXISTS birthcert (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         group_name TEXT,
@@ -21,6 +23,22 @@ db.serialize(() => {
         mother_id TEXT,
         father_name TEXT,
         father_id TEXT
+    )`, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+    });
+
+    // Household Table
+    db.run(`CREATE TABLE IF NOT EXISTS household (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        group_name TEXT,
+        proposal TEXT,
+        name TEXT,
+        id_number TEXT,
+        gender TEXT,
+        dob TEXT,
+        relationship TEXT
     )`, (err) => {
         if (err) {
             console.error(err.message);

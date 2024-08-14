@@ -2,7 +2,7 @@
 import { error } from 'console';
 import { useState, useEffect } from 'react';
 
-export default function Birthcert() {
+export default function Household() {
     const [groupList, setGroupList] = useState([]);
     const [group, setGroup] = useState('');
     const [records, setRecords] = useState([]);
@@ -11,14 +11,14 @@ export default function Birthcert() {
     console.log(groupList, group, records, loading);
 
     const fetchRecords = async (group) => {
-        const records = await fetch(`/api/birthcert/${group}`)
+        const records = await fetch(`/api/household/${group}`)
         const recordsData = await records.json()
         setRecords(recordsData)
     }
 
     useEffect(() => {
         async function fetchGroupData() {
-            const groups = await fetch('/api/birthcert')
+            const groups = await fetch('/api/household')
             const groupsData = await groups.json()
             setGroupList(groupsData || [])
 
@@ -54,12 +54,12 @@ export default function Birthcert() {
     };
 
     const handleDownloadCsv = (group) => () => {
-        window.location.href = `/api/birthcert/csv/${group}`;
+        window.location.href = `/api/household/csv/${group}`;
     };
 
     return (
         <div>
-            <h1>Birthcert</h1>
+            <h1>Household</h1>
             <select onChange={handleGroupChange} value={group}>
                 {groupList?.map((group) => (
                     <option key={group} value={group}>
@@ -82,13 +82,10 @@ function RecordTable ({ records, loading }) {
                     <tr>
                         <th>Proposal</th>
                         <th>Name</th>
-                        <th>ID</th>
+                        <th>ID Number</th>
                         <th>Gender</th>
                         <th>DOB</th>
-                        <th>MotherName</th>
-                        <th>MotherId</th>
-                        <th>FatherName</th>
-                        <th>FatherId</th>
+                        <th>Relationship</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -99,10 +96,7 @@ function RecordTable ({ records, loading }) {
                             <td>{record.id_number}</td>
                             <td>{record.gender}</td>
                             <td>{record.dob}</td>
-                            <td>{record.mother_name}</td>
-                            <td>{record.mother_id}</td>
-                            <td>{record.father_name}</td>
-                            <td>{record.father_id}</td>
+                            <td>{record.relationship}</td>
                         </tr>
                     ))}
                 </tbody>

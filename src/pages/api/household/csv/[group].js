@@ -1,4 +1,4 @@
-// pages/api/birthcert/csv.js
+// pages/api/household/csv.js
 import sqlite3 from 'sqlite3';
 import { parse } from 'json2csv';
 
@@ -23,11 +23,8 @@ export default function handler(req, res) {
             id_number,
             gender,
             dob,
-            mother_name,
-            mother_id,
-            father_name,
-            father_id
-         FROM birthcert WHERE group_name = ? ORDER BY id`;
+            relationship
+         FROM household WHERE group_name = ? ORDER BY id`;
         db.all(sql, [group], (err, rows) => {
             if (err) {
                 res.status(500).json({ error: err.message });
@@ -41,13 +38,10 @@ export default function handler(req, res) {
                     "id_number",
                     "gender",
                     "dob",
-                    "mother_name",
-                    "mother_id",
-                    "father_name",
-                    "father_id",
+                    "relationship",
                 ] });
                 res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-                res.setHeader('Content-Disposition', `attachment; filename="birthcert-${group}.csv"`);
+                res.setHeader('Content-Disposition', `attachment; filename="household-${group}.csv"`);
                 res.status(200).send('\uFEFF' + csv);
             } catch (err) {
                 res.status(500).json({ error: 'Failed to generate CSV', message: err.message });
