@@ -1,4 +1,4 @@
-// pages/api/insert.js
+// pages/api/birthcert.js
 import sqlite3 from 'sqlite3';
 
 const dbPath = './database/ocr.db';
@@ -12,29 +12,21 @@ export default function handler(req, res) {
             }
         });
 
-        const sql = `SELECT 
-            proposal,
-            name,
-            id_number,
-            gender,
-            dob,
-            mother_name,
-            mother_id,
-            father_name,
-            father_id
-         FROM birthcert ORDER BY id`;
+        const sql = `SELECT DISTINCT group_name FROM birthcert`;
         db.all(sql, [], (err, rows) => {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
-            res.status(200).json(rows);
+            res.status(200).json(rows.map(row => row.group_name));
         });
 
         db.close();
     }
     else if (req.method === 'POST') {
-        const { proposal,
+        const { 
+            group,
+            proposal,
             name,
             id,
             gender,
@@ -44,9 +36,6 @@ export default function handler(req, res) {
             fatherName,
             fatherId,
          } = req.body;
-        if (!proposal || !name || !id || !dob || !motherName || !motherId || !fatherName || !fatherId) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
 
         let db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
             if (err) {
@@ -55,7 +44,9 @@ export default function handler(req, res) {
             }
         });
 
-        console.log(proposal,
+        console.log(
+            group,
+            proposal,
             name,
             id,
             gender,
@@ -67,6 +58,7 @@ export default function handler(req, res) {
 
         const sql = `INSERT INTO birthcert 
         (
+            group_name,
             proposal,
             name,
             id_number,
@@ -77,8 +69,9 @@ export default function handler(req, res) {
             father_name,
             father_id
         ) VALUES 
-        (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         db.run(sql, [
+            group,
             proposal,
             name,
             id,
